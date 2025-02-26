@@ -9,6 +9,7 @@ from model import utils,diffusion_process
 # from model.diffusion_process import DiffusionModel
 from Datasets import MyDataset
 import torchvision
+import numpy as np
 
 class Tester:
     def __init__(
@@ -95,6 +96,9 @@ class Tester:
         print("data loaded")
         self.ema.ema_model.eval()
         filelist=os.listdir(glob.glob(self.anom_folder)[0])
+        os.mkdir("str(self.results_folder)+f"/Denoised", exist_ok=True)
+        os.mkdir("str(self.results_folder)+f"/Anomaly", exist_ok=True)
+        os.mkdir("str(self.results_folder)+f"/Sampled", exist_ok=True)
 
         with torch.inference_mode():       
           denoised_imgs = self.ema.ema_model.sample(

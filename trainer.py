@@ -10,6 +10,8 @@ from model import utils,diffusion_process
 # from model.diffusion_process import DiffusionModel
 from Datasets import MyDataset
 import torchvision
+import glob
+import numpy as np
 
 class Trainer:
     def __init__(
@@ -122,9 +124,9 @@ class Trainer:
                     with torch.inference_mode():
                         milestone =self.step // self.save_and_sample_every
                         self.save(milestone)
-                        os.makedirs(str(self.results_folder)+f"/{milestone}/GT")
-                        os.makedirs(str(self.results_folder)+f"/{milestone}/Sampled")
-                        os.makedirs(str(self.results_folder)+f"/{milestone}/Denoised")
+                        os.makedirs(str(self.results_folder)+f"/{milestone}/GT",exist_ok=True)
+                        os.makedirs(str(self.results_folder)+f"/{milestone}/Sampled",exist_ok=True)
+                        os.makedirs(str(self.results_folder)+f"/{milestone}/Denoised",exist_ok=True)
                         self.save(milestone)
                         denoised_imgs = self.ema.ema_model.sample(
                             #batch_size=self.num_samples

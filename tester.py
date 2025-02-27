@@ -9,6 +9,8 @@ from model import utils,diffusion_process
 # from model.diffusion_process import DiffusionModel
 from Datasets import MyDataset
 import torchvision
+import os
+import glob
 import numpy as np
 
 class Tester:
@@ -59,12 +61,14 @@ class Tester:
     @property
     def device(self) -> str:
         device="cuda" if torch.cuda.is_available() else "cpu"
+        os.environ['TORCH_USE_CUDA_DSA'] = "1"
         return device
 
 
     def load(self) -> None:
         data = torch.load(self.params,
             map_location=self.device,
+            weights_only=True
         )
 
 
@@ -96,9 +100,6 @@ class Tester:
         print("data loaded")
         self.ema.ema_model.eval()
         filelist=os.listdir(glob.glob(self.anom_folder)[0])
-        os.mkdir("str(self.results_folder)+f"/Denoised", exist_ok=True)
-        os.mkdir("str(self.results_folder)+f"/Anomaly", exist_ok=True)
-        os.mkdir("str(self.results_folder)+f"/Sampled", exist_ok=True)
 
         with torch.inference_mode():       
           denoised_imgs = self.ema.ema_model.sample(

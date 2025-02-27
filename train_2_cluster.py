@@ -12,6 +12,10 @@ from model.UNet import TwoResUNet,OneResUNet #this module is defined within the 
 #from tester import Tester #not running testing on this code, training only.
 
 
+os.environ["TORCH_USE_CUDA_DSA"]="1"
+os.environ["TORCH_CUDA_ALLOC_SYNC"]="1"
+
+
 #This file will need to be abstracted out of this code and read in later.
 config_file={
   "model_name": "twores_128_1",
@@ -19,7 +23,7 @@ config_file={
     "train_batch_size": 16, #currently 1680 images in Ground-Truth, which means there are 105 batches per epoch
     "train_lr": 1e-4,
     "train_num_steps": 1000,
-    "save_and_sample_every": 300,
+    "save_and_sample_every": 100,
     "num_samples": 4
   },
   "unet_config": {
@@ -44,7 +48,7 @@ unet_config = config_file.get("unet_config")
 trainer_config = config_file.get("trainer_config")
 diffusion_config = config_file.get("diffusion_config")
 
-unet_ = TwoResUNet #Set Unet Type
+unet_ = OneResUNet #Set Unet Type
 
 model = unet_(
     dim=unet_config.get("input"),
@@ -62,14 +66,14 @@ diffusion_model = DiffusionModel(
 #make input and output paths relative to make it easier to to add code to your desired directory
 trainer = Trainer(
     diffusion_model=diffusion_model,
-    folder='./Data/Ground-Truth',
+    folder='./Data/GroundTruth',
     results_folder='./Results',
     train_batch_size=trainer_config.get("train_batch_size"),
     train_lr=trainer_config.get("train_lr"),
     train_num_steps=trainer_config.get("train_num_steps"),
     save_and_sample_every=trainer_config.get("save_and_sample_every"),
     num_samples=trainer_config.get("num_samples"),
-    best_params='./Results/model-X.pt')
+    best_params='./Results/model-3.pt')
 
 
-trainer.train(ifcontinue=True)
+trainer.train(ifcontinue=False)

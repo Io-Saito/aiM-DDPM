@@ -48,6 +48,7 @@ class Trainer:
         self.ds = MyDataset(
             folder, self.image_size 
         )
+        self.folder=folder
         self.dl = utils.cycle(
             DataLoader(
                 self.ds, batch_size=train_batch_size, shuffle=True, pin_memory=True
@@ -85,6 +86,7 @@ class Trainer:
             data = torch.load(
                 self.best_params,
                 map_location=self.device,
+                weigths_only=True
             )
             self.model.model.load_state_dict(data["model"])
 
@@ -103,8 +105,10 @@ class Trainer:
         with tqdm(initial=self.step, total=self.train_num_steps) as pbar:
             while self.step < self.train_num_steps:
                 total_loss = 0.0
-                data = next(self.dl)[0].to(self.device)
-                index=next(self.dl)[1].detach().cpu().numpy()
+                loaded_data=next(self.dl)
+                data = loaded_data[0].to(self.device)
+                index=loaded_data[1].detach().cpu().numpy()
+                filelist=os.listdir(glob.glob(self.folder)[0])
                 loss = self.model(data)
                 total_loss += loss.item()
 
@@ -140,6 +144,6 @@ class Trainer:
                       np.save(str(self.results_folder)+f"/{milestone}/Sampled/{ix}.npy",sampled_img.detach().cpu().numpy())
 
                     for ix, denoised_img in enumerate(denoised_imgs):
-                      np.save(str(self.results_folder)+f"/{milestone}/Denoised/{index[ix]}.npy",denoised_img.detach().cpu().numpy())
-                      np.save(str(self.results_folder)+f"/{milestone}/GT/{index[ix]}.npy",data[ix,0,:,:].detach().cpu().numpy())
+                      np.save(str(self.results_folder)+f"/{milestone}/Denoised/{filelist[index[ix]]}",denoised_img.detach().cpu().numpy())
+                      np.save(str(self.results_folder)+f"/{milestone}/GT/{filelist[index[ix]]}",data[ix,0,:,:].detach().cpu().numpy())
                 pbar.update(1)
